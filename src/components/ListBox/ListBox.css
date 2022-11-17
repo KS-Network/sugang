@@ -1,0 +1,16 @@
+.tableWrapper {
+  border: grey 1px solid;
+  width: 100%;
+  min-width: 820px;
+  overflow-y: scroll;
+}
+
+.ListBox {
+  display: inline-block;
+  height: 300px;
+}
+
+.ListBox td {
+  text-align: center;
+  padding: 5px 15px;
+}
