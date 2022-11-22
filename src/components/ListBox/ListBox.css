@@ -14,3 +14,17 @@
   text-align: center;
   padding: 5px 15px;
 }
+
+.ListBox a {
+  text-decoration: underline;
+  color: blue;
+  cursor: pointer;
+}
+
+.searchDiv,
+.searchDiv p,
+.searchDiv .options,
+.searchDiv .value {
+  display: inline-block;
+  margin-right: 15px;
+}
