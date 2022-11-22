@@ -15,11 +15,11 @@ export default function LoginBox() {
     try {
       console.log(info);
       // const res = await api.post("/sign-in", info);
-      // if (res.success === true) {
+      // if (res.data.success === true) {
       setIsLogin(true);
       // }
     } catch (error) {
-      console.log(error);
+      alert(`로그인 실패 : ${error}`);
     }
   }
 
