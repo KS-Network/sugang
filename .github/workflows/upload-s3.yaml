@@ -2,7 +2,7 @@ name: upload-s3
 on:
   push:
     branches:
-      - feat/gh-action
+      - main
 jobs:
   upload:
     runs-on: ubuntu-latest
