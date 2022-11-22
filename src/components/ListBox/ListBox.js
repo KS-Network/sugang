@@ -11,7 +11,6 @@ function Lecture(
     credit,
     title,
     lecture_id,
-    class_no,
     professor,
     quota,
     attendance,
@@ -20,7 +19,7 @@ function Lecture(
 ) {
   // makeJSON : e -> JSON
   // post modified data to Server.
-  const makeJSON = (e) => {
+  async function makeJSON(e) {
     let dataList =
       e.target.parentElement.parentElement.getElementsByTagName("td");
     let changeData = prompt("변경할 제목 입력");
@@ -34,8 +33,7 @@ function Lecture(
       grade: dataList[1].innerText,
       credit: dataList[2].innerText,
       title: dataList[3].innerText,
-      lecture_id: dataList[4].innerText,
-      class_no: dataList[5].innerText,
+      lecture_id: dataList[4].innerText + "-" + dataList[5].innerText,
       professor: dataList[6].innerText,
       quota: dataList[7].innerText,
       attendance: dataList[8].innerText,
@@ -43,7 +41,76 @@ function Lecture(
 
     // post data to api
     console.log(JSON);
-  };
+
+    var info = {
+      lecture: JSON,
+    };
+
+    try {
+      // const res = await api.post("/lecture", info);
+      alert("수정완료");
+
+      // needs email functions.
+    } catch (error) {
+      alert(`수정 실패 : ${error}`);
+    }
+  }
+
+  async function application(e) {
+    let dataList =
+      e.target.parentElement.parentElement.getElementsByTagName("td");
+    var info = {
+      lecture_id: dataList[4].innerText + "-" + dataList[5].innerText,
+    };
+    console.log(info);
+
+    try {
+      const res = await api.post("/attendance", info);
+      alert("신청완료");
+    } catch (error) {
+      alert(`신청 불가능 : ${error}`);
+    } finally {
+    }
+  }
+
+  async function remove(e) {
+    let dataList =
+      e.target.parentElement.parentElement.getElementsByTagName("td");
+    var info = {
+      lecture_id: dataList[4].innerText + "-" + dataList[5].innerText,
+    };
+    console.log(info);
+
+    try {
+      // const res = await api.post("/lecture", info);
+      e.target.parentElement.parentElement.remove();
+      alert("삭제완료");
+    } catch (error) {
+      alert(`삭제 불가능 : ${error}`);
+    } finally {
+    }
+  }
+
+  async function cancel(e) {
+    let dataList =
+      e.target.parentElement.parentElement.getElementsByTagName("td");
+    var info = {
+      lecture_id: dataList[4].innerText + "-" + dataList[5].innerText,
+    };
+
+    try {
+      var lecture_id = "1136-2010-00";
+      var student_id = "201701001";
+      await api.delete(
+        `/attendance?lecture_id=${lecture_id}&student_id=${student_id}`,
+        info
+      );
+      e.target.parentElement.parentElement.remove();
+      alert("취소완료");
+    } catch (error) {
+      alert(`취소 불가능 : ${error}`);
+    }
+  }
 
   return mode < 2 ? (
     <tr>
@@ -51,28 +118,16 @@ function Lecture(
       <td>{grade}</td>
       <td>{credit}</td>
       <td>{title}</td>
-      <td>{lecture_id}</td>
-      <td>{class_no}</td>
+      <td>{lecture_id.substring(0, 9)}</td>
+      <td>{lecture_id.substring(10)}</td>
       <td>{professor}</td>
       <td>{quota}</td>
       <td>{attendance}</td>
       <td>
         {mode === 0 ? (
-          <button
-            onClick={() => {
-              alert("신청 완료");
-            }}
-          >
-            신청하기
-          </button>
+          <button onClick={application}>신청하기</button>
         ) : (
-          <button
-            onClick={() => {
-              alert("취소 완료");
-            }}
-          >
-            취소하기
-          </button>
+          <button onClick={cancel}>취소하기</button>
         )}
       </td>
     </tr>
@@ -91,8 +146,8 @@ function Lecture(
         <td>
           <a onClick={makeJSON}>{title}</a>
         </td>
-        <td>{lecture_id}</td>
-        <td>{class_no}</td>
+        <td>{lecture_id.substring(0, 9)}</td>
+        <td>{lecture_id.substring(10)}</td>
         <td>
           <a onClick={makeJSON}>{professor}</a>
         </td>
@@ -101,40 +156,24 @@ function Lecture(
         </td>
         <td>{attendance}</td>
         <td>
-          <button>삭제하기</button>
+          <button onClick={remove}>삭제하기</button>
         </td>
       </tr>
     </>
   );
 }
 
+// 0 : all-list, 1 : user, 2 : root
 export default function ListBox({ mode }) {
-  // 0 : all-list, 1 : user, 2 : root
   const [lectures, setLectures] = useState([]);
 
   async function getLectures() {
     try {
-      // const res = await api.get("/lecture");
+      const res = await api.get("/lecture");
 
-      var res = {
-        error: null,
-        data: [
-          {
-            department: "Computer Science",
-            grade: 4,
-            credit: 3,
-            title: "test",
-            lecture_id: "123456781234",
-            class_no: "00",
-            professor: "kim",
-            quota: 20,
-            attendance: 0,
-          },
-        ],
-      };
       setLectures(res.data);
     } catch (error) {
-      console.log(error);
+      alert(`강의 불러오기 실패 : ${error}`);
     }
   }
 
@@ -142,49 +181,50 @@ export default function ListBox({ mode }) {
     try {
       // get user lecture data
       // return;
-      // const res = await api.get("/lecture");
+      var id = "201701001";
+      const res = await api.get(`/student-lecture?student_id=${id}`);
 
-      var res = {
-        error: null,
-        data: [
-          {
-            department: "Computer Science",
-            grade: 4,
-            credit: 3,
-            title: "test",
-            lecture_id: "123456781234",
-            class_no: "00",
-            professor: "kim",
-            quota: 20,
-            attendance: 0,
-          },
-          {
-            department: "Computer Science",
-            grade: 4,
-            credit: 3,
-            title: "test",
-            lecture_id: "123456781234",
-            class_no: "00",
-            professor: "kim",
-            quota: 20,
-            attendance: 0,
-          },
-        ],
-      };
+      // var res = {
+      //   error: null,
+      //   data: [
+      //     {
+      //       department: "Computer Science",
+      //       grade: 4,
+      //       credit: 3,
+      //       title: "test",
+      //       lecture_id: "1000-9581-00",
+      //       professor: "kim",
+      //       quota: 20,
+      //       attendance: 0,
+      //     },
+      //     {
+      //       department: "Computer Science",
+      //       grade: 4,
+      //       credit: 3,
+      //       title: "test",
+      //       lecture_id: "1000-9581-00",
+      //       class_no: "00",
+      //       professor: "kim",
+      //       quota: 20,
+      //       attendance: 0,
+      //     },
+      //   ],
+      // };
       setLectures(res.data);
     } catch (error) {
-      console.log(error);
+      alert(`강의 불러오기 실패 : ${error}`);
     }
   }
 
   async function searchLectures() {
-    let option = document.getElementsByClassName("options")[0].value;
-    let value = document.getElementsByClassName("value")[0].value;
+    var info = {
+      option: document.getElementsByClassName("options")[0].value,
+      value: document.getElementsByClassName("value")[0].value,
+    };
 
     try {
-      // get user lecture data
-      // return;
-      // const res = await api.get("/lecture");
+      // post info and get searched lecture data
+      // const res = await api.post("/lecture", info);
 
       var res = {
         error: null,
@@ -194,18 +234,7 @@ export default function ListBox({ mode }) {
             grade: 4,
             credit: 3,
             title: "test",
-            lecture_id: "123456781234",
-            class_no: "00",
-            professor: "kim",
-            quota: 20,
-            attendance: 0,
-          },
-          {
-            department: "Computer Science",
-            grade: 4,
-            credit: 3,
-            title: "test",
-            lecture_id: "123456781234",
+            lecture_id: "1000-9581-00",
             class_no: "00",
             professor: "kim",
             quota: 20,
@@ -213,9 +242,10 @@ export default function ListBox({ mode }) {
           },
         ],
       };
+
       setLectures(res.data);
     } catch (error) {
-      console.log(error);
+      alert(`강의 불러오기 실패 : ${error}`);
     }
   }
 
@@ -227,21 +257,30 @@ export default function ListBox({ mode }) {
   return (
     <div>
       {mode === 0 ? (
-        <div className="searchDiv">
-          <p>검색</p>
-          <select className="options">
-            <option value={"department"}>학과</option>
-            <option value={"grade"}>학년</option>
-            <option value={"credit"}>학점</option>
-            <option value={"title"}>과목명</option>
-            <option value={"class_id"}>과목번호</option>
-            <option value={"professor"}>교수명</option>
-          </select>
-          <input className="value"></input>
-          <button className="searchBtn" onClick={searchLectures}>
-            검색
-          </button>
-        </div>
+        <>
+          <div className="searchDiv">
+            <p>검색</p>
+            <select className="options">
+              <option value={"department"}>학과</option>
+              <option value={"grade"}>학년</option>
+              <option value={"credit"}>학점</option>
+              <option value={"title"}>과목명</option>
+              <option value={"class_id"}>과목번호</option>
+              <option value={"professor"}>교수명</option>
+            </select>
+            <input className="value"></input>
+            <button className="searchBtn" onClick={searchLectures}>
+              검색
+            </button>
+          </div>
+          <div>
+            과목번호로 신청하기
+            <input className="value"></input>
+            <button className="searchBtn" onClick={searchLectures}>
+              신청하기
+            </button>
+          </div>
+        </>
       ) : (
         ""
       )}
