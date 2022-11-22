@@ -2,7 +2,7 @@ import React from "react";
 import "./EnrolmentBox.css";
 import ListBox from "../ListBox/ListBox";
 
-export default function EnrolmentBox({ title }) {
+export default function EnrolmentBox({ title, mode }) {
   /*
     EnrolmentBox
     1. Write the title.
@@ -11,7 +11,7 @@ export default function EnrolmentBox({ title }) {
   return (
     <div>
       <h2>{title}</h2>
-      <ListBox />
+      <ListBox mode={mode} />
     </div>
   );
 }
