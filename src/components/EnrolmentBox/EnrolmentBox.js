@@ -8,6 +8,7 @@ export default function EnrolmentBox({
   toggle,
   login,
   changestate,
+  setLogin,
 }) {
   /*
     EnrolmentBox
@@ -22,6 +23,7 @@ export default function EnrolmentBox({
         login={login}
         toggle={toggle}
         changestate={changestate}
+        setLogin={setLogin}
       />
     </div>
   );

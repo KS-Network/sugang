@@ -3,7 +3,7 @@ import { api } from "../../api";
 import "./LoginBox.css";
 import { setCookie, getCookie, deleteCookie } from "../../Cookie";
 
-export default function LoginBox({ func, user, loginInfo, mode }) {
+export default function LoginBox({ func, user, loginInfo, mode, setLogin }) {
   async function login() {
     var info = {
       student_id: document.getElementsByClassName("userid")[0].value,
@@ -31,6 +31,7 @@ export default function LoginBox({ func, user, loginInfo, mode }) {
   async function logout() {
     deleteCookie("studentToken");
     deleteCookie("student_id");
+    setLogin(0);
   }
 
   async function rootLogin() {
@@ -59,6 +60,7 @@ export default function LoginBox({ func, user, loginInfo, mode }) {
   async function rootLogout() {
     deleteCookie("adminToken");
     deleteCookie("admin_id");
+    setLogin(0);
   }
 
   return (
