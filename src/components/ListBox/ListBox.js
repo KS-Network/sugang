@@ -48,8 +48,8 @@ function Lecture(
       alert("수정완료");
       // window.location.href = "/";
       // needs email functions.
-    } catch (error) {
-      alert(`수정 실패 : ${error}`);
+    } catch (res) {
+      alert(JSON.stringify(res.response.data.error));
     }
   }
 
@@ -67,8 +67,8 @@ function Lecture(
       alert("신청완료");
       changestate();
       // window.location.href = "/";
-    } catch (error) {
-      alert(`신청 불가능 : ${error}`);
+    } catch (res) {
+      alert(JSON.stringify(res.response.data.error));
     } finally {
     }
   }
@@ -115,8 +115,8 @@ function Lecture(
       alert("취소완료");
       changestate();
       // window.location.href = "/";
-    } catch (error) {
-      alert(`취소 불가능 : ${error}`);
+    } catch (res) {
+      alert(JSON.stringify(res.response.data.error));
     }
   }
 
@@ -181,8 +181,8 @@ export default function ListBox({ mode, login, toggle, changestate }) {
       const res = await api.get("/lecture");
 
       setLectures(res.data.data);
-    } catch (error) {
-      alert(`강의 불러오기 실패 : ${error}`);
+    } catch (res) {
+      alert(JSON.stringify(res.response.data.error));
     }
   }
 
@@ -195,8 +195,8 @@ export default function ListBox({ mode, login, toggle, changestate }) {
       );
 
       setLectures(res.data.data);
-    } catch (error) {
-      alert(`강의 불러오기 실패 : ${error}`);
+    } catch (res) {
+      alert(JSON.stringify(res.response.data.error));
     }
   }
 
@@ -211,8 +211,8 @@ export default function ListBox({ mode, login, toggle, changestate }) {
       console.log(res);
 
       setLectures(res.data.data);
-    } catch (error) {
-      alert(`강의 불러오기 실패 : ${error}`);
+    } catch (res) {
+      alert(JSON.stringify(res.response.data.error));
     }
   }
 
