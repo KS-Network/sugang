@@ -78,21 +78,17 @@ function Lecture(
       e.target.parentElement.parentElement.getElementsByTagName("td");
     var info = {
       lecture_id: dataList[4].innerText + "-" + dataList[5].innerText,
-
-      cookies: {
-        studentToken: await getCookie("studentToken"),
-      },
     };
     console.log(info);
 
     try {
-      // const res = await api.post("/lecture", info);
+      const res = await api.delete(`/lecture?lecture_id=${info.lecture_id}`);
       e.target.parentElement.parentElement.remove();
       alert("삭제완료");
       changestate();
       // window.location.href = "/";
-    } catch (error) {
-      alert(`삭제 불가능 : ${error}`);
+    } catch (res) {
+      alert(JSON.stringify(res.response.data.error));
     } finally {
     }
   }
