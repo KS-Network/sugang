@@ -2,3 +2,7 @@
 .userpw {
   margin-right: 20px;
 }
+
+.user {
+  display: inline-block;
+}
