@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { api } from "../../api";
 import "./ListBox.css";
+import { setCookie, getCookie, deleteCookie } from "../../Cookie";
 
 // Lecture : Make 1 row for 1 lecture.
 // mode : 0 -> all lectures, 1 -> my lectures, 2 -> root
@@ -15,7 +16,8 @@ function Lecture(
     quota,
     attendance,
   },
-  mode
+  mode,
+  changestate
 ) {
   // makeJSON : e -> JSON
   // post modified data to Server.
@@ -28,7 +30,7 @@ function Lecture(
 
     e.target.innerText = changeData;
 
-    let JSON = {
+    let data = {
       department: dataList[0].innerText,
       grade: dataList[1].innerText,
       credit: dataList[2].innerText,
@@ -36,20 +38,15 @@ function Lecture(
       lecture_id: dataList[4].innerText + "-" + dataList[5].innerText,
       professor: dataList[6].innerText,
       quota: dataList[7].innerText,
-      attendance: dataList[8].innerText,
     };
 
     // post data to api
-    console.log(JSON);
-
-    var info = {
-      lecture: JSON,
-    };
+    console.log(data);
 
     try {
-      // const res = await api.post("/lecture", info);
+      const res = await api.put("/lecture", data);
       alert("수정완료");
-
+      // window.location.href = "/";
       // needs email functions.
     } catch (error) {
       alert(`수정 실패 : ${error}`);
@@ -61,12 +58,15 @@ function Lecture(
       e.target.parentElement.parentElement.getElementsByTagName("td");
     var info = {
       lecture_id: dataList[4].innerText + "-" + dataList[5].innerText,
+      student_id: await getCookie("student_id"),
     };
-    console.log(info);
+    console.log(JSON.stringify(info));
 
     try {
-      const res = await api.post("/attendance", info);
+      const res = await api.post("/attendance", JSON.stringify(info));
       alert("신청완료");
+      changestate();
+      // window.location.href = "/";
     } catch (error) {
       alert(`신청 불가능 : ${error}`);
     } finally {
@@ -78,6 +78,10 @@ function Lecture(
       e.target.parentElement.parentElement.getElementsByTagName("td");
     var info = {
       lecture_id: dataList[4].innerText + "-" + dataList[5].innerText,
+
+      cookies: {
+        studentToken: await getCookie("studentToken"),
+      },
     };
     console.log(info);
 
@@ -85,6 +89,8 @@ function Lecture(
       // const res = await api.post("/lecture", info);
       e.target.parentElement.parentElement.remove();
       alert("삭제완료");
+      changestate();
+      // window.location.href = "/";
     } catch (error) {
       alert(`삭제 불가능 : ${error}`);
     } finally {
@@ -96,17 +102,23 @@ function Lecture(
       e.target.parentElement.parentElement.getElementsByTagName("td");
     var info = {
       lecture_id: dataList[4].innerText + "-" + dataList[5].innerText,
+
+      cookies: {
+        studentToken: await getCookie("studentToken"),
+      },
     };
 
     try {
-      var lecture_id = "1136-2010-00";
-      var student_id = "201701001";
       await api.delete(
-        `/attendance?lecture_id=${lecture_id}&student_id=${student_id}`,
+        `/attendance?lecture_id=${lecture_id}&student_id=${await getCookie(
+          "student_id"
+        )}`,
         info
       );
       e.target.parentElement.parentElement.remove();
       alert("취소완료");
+      changestate();
+      // window.location.href = "/";
     } catch (error) {
       alert(`취소 불가능 : ${error}`);
     }
@@ -164,14 +176,15 @@ function Lecture(
 }
 
 // 0 : all-list, 1 : user, 2 : root
-export default function ListBox({ mode }) {
-  const [lectures, setLectures] = useState([]);
+export default function ListBox({ mode, login, toggle, changestate }) {
+  const [lectures, setLectures] = useState(-1);
+  const [logInfo, setLogInfo] = useState(login);
 
   async function getLectures() {
     try {
       const res = await api.get("/lecture");
 
-      setLectures(res.data);
+      setLectures(res.data.data);
     } catch (error) {
       alert(`강의 불러오기 실패 : ${error}`);
     }
@@ -181,78 +194,61 @@ export default function ListBox({ mode }) {
     try {
       // get user lecture data
       // return;
-      var id = "201701001";
-      const res = await api.get(`/student-lecture?student_id=${id}`);
+      const res = await api.get(
+        `/student-lecture?student_id=${await getCookie("student_id")}`
+      );
 
-      // var res = {
-      //   error: null,
-      //   data: [
-      //     {
-      //       department: "Computer Science",
-      //       grade: 4,
-      //       credit: 3,
-      //       title: "test",
-      //       lecture_id: "1000-9581-00",
-      //       professor: "kim",
-      //       quota: 20,
-      //       attendance: 0,
-      //     },
-      //     {
-      //       department: "Computer Science",
-      //       grade: 4,
-      //       credit: 3,
-      //       title: "test",
-      //       lecture_id: "1000-9581-00",
-      //       class_no: "00",
-      //       professor: "kim",
-      //       quota: 20,
-      //       attendance: 0,
-      //     },
-      //   ],
-      // };
-      setLectures(res.data);
+      setLectures(res.data.data);
     } catch (error) {
       alert(`강의 불러오기 실패 : ${error}`);
     }
   }
 
   async function searchLectures() {
-    var info = {
-      option: document.getElementsByClassName("options")[0].value,
-      value: document.getElementsByClassName("value")[0].value,
-    };
+    var option = document.getElementsByClassName("options")[0].value;
+    var value = document.getElementsByClassName("value")[0].value;
 
     try {
       // post info and get searched lecture data
-      // const res = await api.post("/lecture", info);
+      const res = await api.get(`/lecture?${option}=${value}`);
 
-      var res = {
-        error: null,
-        data: [
-          {
-            department: "Computer Science",
-            grade: 4,
-            credit: 3,
-            title: "test",
-            lecture_id: "1000-9581-00",
-            class_no: "00",
-            professor: "kim",
-            quota: 20,
-            attendance: 0,
-          },
-        ],
-      };
+      console.log(res);
 
-      setLectures(res.data);
+      setLectures(res.data.data);
     } catch (error) {
       alert(`강의 불러오기 실패 : ${error}`);
     }
   }
 
+  async function applyLectures() {
+    var value = document
+      .getElementsByClassName("numAplDiv")[0]
+      .getElementsByClassName("value")[0].value;
+
+    var info = {
+      lecture_id: value,
+      student_id: await getCookie("student_id"),
+    };
+
+    console.log(info);
+
+    api
+      .post("/attendance", info)
+      .then((res) => {
+        alert("신청완료");
+        console.log(res.data.data);
+
+        setLectures(res.data.data);
+      })
+      .catch((res) => {
+        alert(JSON.stringify(res.response.data.error));
+      });
+  }
+
   useEffect(() => {
     if (mode !== 1) getLectures();
-    else if (mode === 1) getUserLectures();
-  }, []);
+    else if (mode === 1 && login) getUserLectures();
+  }, [login, toggle]);
 
   return (
     <div>
@@ -273,11 +269,14 @@ export default function ListBox({ mode }) {
               검색
             </button>
           </div>
-          <div>
-            과목번호로 신청하기
-            <input className="value"></input>
-            <button className="searchBtn" onClick={searchLectures}>
-              신청하기
+          <div className="numAplDiv">
+            {"과목번호로 신청 "}
+            <input
+              className="value"
+              placeholder="과목번호-분반으로 검색"
+            ></input>
+            <button className="alnBtn" onClick={applyLectures}>
+              신청
             </button>
           </div>
         </>
@@ -303,9 +302,23 @@ export default function ListBox({ mode }) {
             </tr>
           </thead>
           <tbody>
-            {lectures.map((lecture) => {
-              return Lecture(lecture, mode);
-            })}
+            {mode === 0
+              ? lectures !== -1
+                ? lectures.map((lecture) => {
+                    return Lecture(lecture, mode, changestate);
+                  })
+                : ""
+              : logInfo
+              ? lectures !== -1
+                ? lectures.map((lecture) => {
+                    return Lecture(lecture, mode, changestate);
+                  })
+                : ""
+              : lectures !== -1
+              ? lectures.map((lecture) => {
+                  return Lecture(lecture, mode, changestate);
+                })
+              : ""}
           </tbody>
         </table>
       </div>
