@@ -28,6 +28,11 @@ export default function LoginBox({ func, user, loginInfo, mode }) {
     }
   }
 
+  async function logout() {
+    deleteCookie("studentToken");
+    deleteCookie("student_id");
+  }
+
   async function rootLogin() {
     var info = {
       email: document.getElementsByClassName("userid")[0].value,
@@ -51,12 +56,20 @@ export default function LoginBox({ func, user, loginInfo, mode }) {
     }
   }
 
+  async function rootLogout() {
+    deleteCookie("adminToken");
+    deleteCookie("admin_id");
+  }
+
   return (
     <div>
       {mode !== 1 ? (
         loginInfo ? (
           <div>
             환영합니다 <p className="user">{user}</p>님!
+            <button className="logoutbtn" onClick={logout}>
+              로그아웃
+            </button>
           </div>
         ) : (
           <div>
@@ -70,6 +83,9 @@ export default function LoginBox({ func, user, loginInfo, mode }) {
       ) : loginInfo ? (
         <div>
           환영합니다 <p className="user">{user}</p>님!
+          <button className="logoutbtn" onClick={rootLogout}>
+            로그아웃
+          </button>
         </div>
       ) : (
         <div>
