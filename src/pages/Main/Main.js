@@ -21,14 +21,17 @@ export default function Main() {
     setToggle(!toggle);
   };
 
-  async function init() {
+  const setLogin = (state) => {
+    setLoginInfo(state);
+  };
+
+  function init() {
     setUser(getCookie("student_id"));
+    if (user == null || user == "") setLoginInfo(0);
   }
 
   useEffect(() => {
     init();
-    if (user == "" || user == null) return;
-    setLoginInfo(1);
   }, []);
 
   return (
@@ -43,6 +46,7 @@ export default function Main() {
           toggle={toggle}
           loginInfo={loginInfo}
           changestate={changeState}
+          setLoginInfo={setLogin}
         />
         <EnrolmentBox
           title={"신청한 강의"}
@@ -51,6 +55,7 @@ export default function Main() {
           toggle={toggle}
           loginInfo={loginInfo}
           changestate={changeState}
+          setLoginInfo={setLogin}
         />
       </div>
     </div>

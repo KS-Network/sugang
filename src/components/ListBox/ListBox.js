@@ -54,6 +54,13 @@ function Lecture(
   }
 
   async function application(e) {
+    var student_id = document.getElementsByClassName("user")[0];
+
+    if (!student_id) {
+      alert("로그인해주세요.");
+      return;
+    }
+
     let dataList =
       e.target.parentElement.parentElement.getElementsByTagName("td");
     var info = {
